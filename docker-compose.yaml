@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  proxy:
+    build: .
+    image: monacoind-proxy
+    command: [
+      "./proxy"
+    ]
+    ports:
+      - "1337:1337"
