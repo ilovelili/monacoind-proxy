@@ -25,7 +25,7 @@ type SendFromArgs struct {
 
 // Response response
 type Response struct {
-	Result []byte
+	Transaction string
 }
 
 // Service service wrapper
@@ -35,8 +35,11 @@ type Service struct {
 
 // SendFrom passthru to monacoind with a response delay
 func (s *Service) SendFrom(r *http.Request, args *SendFromArgs, result *Response) (err error) {
-	reqbody := strings.NewReader(fmt.Sprintf(`{"jsonrpc":"2.0","id":"curltext","method":"sendfrom","params":["%s","%s", %f]`, args.From, args.To, args.Amount))
-	req, err := http.NewRequest("POST", s.Config.Endpoint, reqbody)
+	rawreq := fmt.Sprintf(`{"jsonrpc":"1.0","id":"curltext","method":"sendfrom","params":["%s","%s", %f]}`, args.From, args.To, args.Amount)
+	url := s.Config.Endpoint
+
+	reqbody := strings.NewReader(rawreq)
+	req, err := http.NewRequest("POST", url, reqbody)
 	if err != nil {
 		return
 	}
@@ -52,8 +55,9 @@ func (s *Service) SendFrom(r *http.Request, args *SendFromArgs, result *Response
 		return
 	}
 
+	// todo: json unmarshall it check response structure
+	*result = Response{Transaction: string(respbody)}
 	time.Sleep(s.Config.GetDelay())
-	*result = Response{Result: respbody}
 	return
 }
 
