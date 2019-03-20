@@ -1,0 +1,4 @@
+{
+    "endpoint": "<<monacoid rpc endpoint>>",
+    "delay": 60
+}
