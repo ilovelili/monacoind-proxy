@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
 	"time"
 
@@ -55,6 +58,15 @@ func (s *Service) SendFrom(r *http.Request, args *SendFromArgs, result *Response
 }
 
 func main() {
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs)
+
+	go func() {
+		s := <-sigs
+		log.Printf("RECEIVED SIGNAL: %s", s)
+		os.Exit(1)
+	}()
+
 	proxy := &Service{
 		Config: config.GetConfig(),
 	}
